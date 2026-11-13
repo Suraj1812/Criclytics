@@ -84,7 +84,7 @@ export function MediaViewer({
   }, [detail?.kind, detail?.streamUrl]);
 
   return (
-    <Card className="rounded-3xl border-border/70 bg-card/95">
+    <Card className="rounded-lg border-border/70 bg-card/95">
       <CardHeader className="border-b border-border/70">
         <div className="space-y-3">
           <CardTitle className="text-2xl tracking-tight">{detail?.title || item?.title || "Media preview"}</CardTitle>
@@ -107,9 +107,9 @@ export function MediaViewer({
         </div>
       </CardHeader>
       <CardContent className="space-y-5 p-5">
-        <div className="flex aspect-video items-center justify-center overflow-hidden rounded-3xl border border-border/70 bg-secondary/30 p-3">
+        <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-secondary/30 p-3">
           {detail?.kind === "video" && detail.streamUrl ? (
-            <video className="h-full w-full rounded-2xl bg-black object-contain" controls playsInline poster={imageUrl || undefined} preload="metadata" ref={videoRef} />
+            <video className="h-full w-full rounded-md bg-black object-contain" controls playsInline poster={imageUrl || undefined} preload="metadata" ref={videoRef} />
           ) : imageUrl ? (
             <img
               alt={selectedGalleryImage?.altText || detail?.title || item?.title || "Media preview"}
@@ -129,7 +129,7 @@ export function MediaViewer({
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
             {galleryImages.map((galleryImage, index) => (
               <button
-                className={`overflow-hidden rounded-2xl border bg-secondary/20 transition ${index === selectedGalleryIndex ? "border-primary ring-2 ring-primary/20" : "border-border/70 hover:border-primary/40"}`}
+                className={`overflow-hidden rounded-md border bg-secondary/20 transition ${index === selectedGalleryIndex ? "border-primary ring-2 ring-primary/20" : "border-border/70 hover:border-primary/40"}`}
                 key={galleryImage.id}
                 onClick={() => setSelectedGalleryIndex(index)}
                 type="button"

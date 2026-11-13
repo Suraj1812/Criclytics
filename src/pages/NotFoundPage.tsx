@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function NotFoundPage() {
   usePageMetadata({
     title: "Page Not Found",
-    description: "The requested Criclytics page could not be found.",
+    description: "The requested Cric Lytics page could not be found.",
     robots: "noindex, nofollow",
     path: "/404"
   });
@@ -16,7 +16,7 @@ export function NotFoundPage() {
     <Card className="mx-auto max-w-2xl rounded-3xl">
       <CardHeader>
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">404</p>
-        <CardTitle className="mt-3 text-3xl">This route doesn’t exist in Criclytics.</CardTitle>
+        <CardTitle className="mt-3 text-3xl">This route doesn’t exist in Cric Lytics.</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="text-sm leading-7 text-muted-foreground">

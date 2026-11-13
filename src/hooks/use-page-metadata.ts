@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const DEFAULT_DESCRIPTION =
-  "Criclytics delivers live cricket scores, upcoming fixtures, completed results, full scorecards, and media in one production-grade match centre.";
+  "Cric Lytics delivers live cricket scores, upcoming fixtures, completed results, full scorecards, and media in one modern match centre.";
 const DEFAULT_KEYWORDS = [
   "live cricket score",
   "cricket fixtures",
@@ -10,7 +10,7 @@ const DEFAULT_KEYWORDS = [
   "cricket scorecard",
   "IPL live score",
   "cricket media",
-  "Criclytics"
+  "Cric Lytics"
 ];
 
 interface MetadataOptions {
@@ -27,7 +27,7 @@ interface MetadataOptions {
 export function usePageMetadata({
   title,
   description = DEFAULT_DESCRIPTION,
-  image = "/og-cover.svg",
+  image = "/og-cover.png",
   path,
   type = "website",
   keywords = DEFAULT_KEYWORDS,
@@ -37,7 +37,7 @@ export function usePageMetadata({
   const location = useLocation();
 
   useEffect(() => {
-    const pageTitle = title.includes("Criclytics") ? title : `${title} | Criclytics`;
+    const pageTitle = /Cric\s?Lytics/i.test(title) ? title : `${title} | Cric Lytics`;
     const canonicalUrl = toAbsoluteUrl(path || location.pathname);
     const imageUrl = toAbsoluteUrl(image);
 
@@ -48,16 +48,18 @@ export function usePageMetadata({
     upsertMeta("name", "robots", robots);
     upsertMeta("name", "googlebot", robots);
     upsertMeta("name", "theme-color", "#08111f");
-    upsertMeta("name", "application-name", "Criclytics");
-    upsertMeta("name", "apple-mobile-web-app-title", "Criclytics");
+    upsertMeta("name", "application-name", "Cric Lytics");
+    upsertMeta("name", "apple-mobile-web-app-title", "Cric Lytics");
 
-    upsertMeta("property", "og:site_name", "Criclytics");
+    upsertMeta("property", "og:site_name", "Cric Lytics");
     upsertMeta("property", "og:title", pageTitle);
     upsertMeta("property", "og:description", description);
     upsertMeta("property", "og:type", type);
     upsertMeta("property", "og:url", canonicalUrl);
     upsertMeta("property", "og:image", imageUrl);
-    upsertMeta("property", "og:image:type", "image/svg+xml");
+    upsertMeta("property", "og:image:type", image.endsWith(".svg") ? "image/svg+xml" : image.endsWith(".png") ? "image/png" : "image/jpeg");
+    upsertMeta("property", "og:image:alt", "Cric Lytics — cricket bat and ball logo");
+    upsertMeta("name", "twitter:image:alt", "Cric Lytics — live cricket scores and scorecards");
     upsertMeta("property", "og:locale", "en_IN");
 
     upsertMeta("name", "twitter:card", "summary_large_image");

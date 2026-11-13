@@ -30,12 +30,12 @@ export function MatchDetailsPage() {
             "live cricket score",
             "match details"
           ],
-          image: match.teams[0].logoUrl || match.teams[1].logoUrl || "/og-cover.svg",
+          image: "/og-cover.png",
           jsonLd: buildSportsEventSchema(match)
         }
       : {
           title: "Cricket Match Details",
-          description: "Open the full Criclytics scorecard, timeline, and stats for this cricket match.",
+          description: "Open the full Cric Lytics scorecard, timeline, and stats for this cricket match.",
           path: id ? `/match/${id}` : "/match"
         }
   );

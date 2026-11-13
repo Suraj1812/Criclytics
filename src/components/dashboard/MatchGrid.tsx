@@ -16,7 +16,7 @@ export function MatchGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3">
       {matches.map((match) => (
         <MatchCard key={match.id} match={match} />
       ))}

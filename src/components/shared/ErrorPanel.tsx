@@ -14,9 +14,9 @@ export function ErrorPanel({
   compact?: boolean;
 }) {
   return (
-    <Card className={compact ? "rounded-2xl" : "rounded-3xl"}>
+    <Card className={compact ? "rounded-md" : "rounded-lg"}>
       <CardHeader className={compact ? "p-5" : undefined}>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-destructive/10 text-destructive">
           <AlertTriangle className="h-5 w-5" />
         </div>
         <CardTitle className="mt-4">{title}</CardTitle>

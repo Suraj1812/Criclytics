@@ -5,12 +5,15 @@
   "description": "Real-time cricket match centre with a FastAPI live-data backend, scorecards, and responsive match tracking.",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:api": "python3 -m uvicorn server.app.main:app --reload --host 127.0.0.1 --port 8787",
-    "dev:all": "sh server/dev-all.sh",
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "node scripts/dev.mjs --api-only",
+    "dev:all": "npm run dev",
     "build": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "setup": "sh scripts/setup.sh",
+    "start": "npm run dev",
+    "dev:web": "vite --host 127.0.0.1 --port 5173 --strictPort"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

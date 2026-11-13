@@ -10,7 +10,7 @@ export function StatsPanel({ match }: { match: MatchDetail }) {
       </div>
 
       <div className="space-y-6">
-        <Card className="rounded-3xl">
+        <Card className="rounded-lg">
           <CardHeader>
             <CardTitle>Match notes</CardTitle>
           </CardHeader>
@@ -36,13 +36,13 @@ export function StatsPanel({ match }: { match: MatchDetail }) {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl">
+        <Card className="rounded-lg">
           <CardHeader>
             <CardTitle>Squads</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             {match.squads.map((squad) => (
-              <div className="rounded-2xl border border-border/70 bg-secondary/30 p-4" key={squad.teamName}>
+              <div className="rounded-md border border-border/70 bg-secondary/30 p-4" key={squad.teamName}>
                 <p className="text-sm font-semibold">{squad.teamName}</p>
                 <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                   {squad.players.map((player) => (
@@ -60,15 +60,15 @@ export function StatsPanel({ match }: { match: MatchDetail }) {
 
 function PerformerGrid({ title, performers }: { title: string; performers: TopPerformer[] }) {
   return (
-    <Card className="rounded-3xl">
+    <Card className="rounded-lg">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">
         {performers.length ? (
           performers.map((performer) => (
-            <div className="rounded-2xl border border-border/70 bg-secondary/30 p-4" key={`${title}-${performer.playerName}-${performer.value}`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{performer.label}</p>
+            <div className="rounded-md border border-border/70 bg-secondary/30 p-4" key={`${title}-${performer.playerName}-${performer.value}`}>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{performer.label}</p>
               <p className="mt-3 text-lg font-semibold">{performer.playerName}</p>
               <p className="mt-1 text-sm font-medium text-foreground">{performer.value}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{performer.secondary}</p>

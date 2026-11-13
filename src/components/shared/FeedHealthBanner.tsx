@@ -47,11 +47,11 @@ export function FeedHealthBanner({
   }
 
   return (
-    <Card className="rounded-2xl border-border/70 bg-secondary/35">
+    <Card className="rounded-md border-border/70 bg-secondary/35">
       <CardContent className="grid gap-3 p-4 lg:grid-cols-2 xl:grid-cols-3">
         {states.map(({ label, detail, icon: Icon }) => (
-          <div className="rounded-2xl border border-border/70 bg-background/70 p-4" key={label}>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+          <div className="rounded-md border border-border/70 bg-background/70 p-4" key={label}>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               <Icon className="h-4 w-4" />
               {label}
             </div>

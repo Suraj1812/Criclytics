@@ -4,7 +4,7 @@ import type { InningScorecard } from "@/types/cricket";
 export function ScorecardPanel({ innings }: { innings: InningScorecard[] }) {
   if (!innings.length) {
     return (
-      <Card className="rounded-3xl">
+      <Card className="rounded-lg">
         <CardContent className="p-6">
           <p className="text-sm text-muted-foreground">Scorecard data is not available for this match yet.</p>
         </CardContent>
@@ -15,7 +15,7 @@ export function ScorecardPanel({ innings }: { innings: InningScorecard[] }) {
   return (
     <div className="space-y-6">
       {innings.map((inning) => (
-        <Card className="rounded-3xl" key={inning.id}>
+        <Card className="rounded-lg" key={inning.id}>
           <CardHeader className="space-y-3">
             <CardTitle className="text-2xl">{inning.name}</CardTitle>
             <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -82,8 +82,8 @@ export function ScorecardPanel({ innings }: { innings: InningScorecard[] }) {
             </TableCard>
 
             {inning.fallOfWickets.length ? (
-              <div className="rounded-2xl border border-border/70 bg-secondary/30 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Fall of wickets</p>
+              <div className="rounded-md border border-border/70 bg-secondary/30 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Fall of wickets</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {inning.fallOfWickets.map((entry) => (
                     <span className="rounded-full bg-background px-3 py-1 text-sm" key={entry}>
@@ -102,7 +102,7 @@ export function ScorecardPanel({ innings }: { innings: InningScorecard[] }) {
 
 function TableCard({ title, children }: React.PropsWithChildren<{ title: string }>) {
   return (
-    <div className="rounded-2xl border border-border/70 bg-background/70">
+    <div className="rounded-md border border-border/70 bg-background/70">
       <div className="border-b border-border/70 px-4 py-3">
         <p className="text-sm font-semibold">{title}</p>
       </div>
@@ -112,7 +112,7 @@ function TableCard({ title, children }: React.PropsWithChildren<{ title: string 
 }
 
 function HeaderCell({ children }: React.PropsWithChildren) {
-  return <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.22em]">{children}</th>;
+  return <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em]">{children}</th>;
 }
 
 function BodyCell({ children, className }: React.PropsWithChildren<{ className?: string }>) {

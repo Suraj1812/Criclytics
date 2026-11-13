@@ -1,20 +1,25 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { startTransition, useEffect, useState } from "react";
-import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Menu, MoonStar, Search, SunMedium, X } from "lucide-react";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import { Moon, Search, Sun, X } from "lucide-react";
 import { CriclyticsLogo } from "@/components/shared/CriclyticsLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/use-theme";
 
 const NAV_ITEMS = [
-  { to: "/live", label: "Live" },
-  { to: "/upcoming", label: "Upcoming" },
-  { to: "/completed", label: "Completed" }
-] as const;
-
-const FILTER_ROUTES = new Set(["/", "/live", "/upcoming", "/completed", "/media"]);
+  { to: "/", label: "Overview" },
+  { to: "/live", label: "Live scores" },
+  { to: "/upcoming", label: "Schedule" },
+  { to: "/completed", label: "Results" },
+  { to: "/media", label: "The clubhouse" },
+];
+const FILTER_ROUTES = new Set(NAV_ITEMS.map((item) => item.to));
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -22,164 +27,142 @@ export function Navbar() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const [searchOpen, setSearchOpen] = useState(false);
   useEffect(() => {
     setQuery(searchParams.get("q") ?? "");
   }, [searchParams]);
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname, location.search]);
-
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const targetPath = FILTER_ROUTES.has(location.pathname) ? location.pathname : "/";
-    const nextParams = new URLSearchParams(targetPath === location.pathname ? searchParams : undefined);
-    const nextQuery = query.trim();
-
-    if (nextQuery) {
-      nextParams.set("q", nextQuery);
-    } else {
-      nextParams.delete("q");
-    }
-
-    startTransition(() => {
-      navigate({
-        pathname: targetPath,
-        search: nextParams.toString() ? `?${nextParams.toString()}` : ""
-      });
-    });
+    const pathname = FILTER_ROUTES.has(location.pathname)
+      ? location.pathname
+      : "/";
+    const params = new URLSearchParams(
+      FILTER_ROUTES.has(location.pathname) ? searchParams : undefined,
+    );
+    if (query.trim()) params.set("q", query.trim());
+    else params.delete("q");
+    startTransition(() => navigate({ pathname, search: params.toString() }));
   }
-
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="container py-4">
-        <div className="flex min-w-0 items-center justify-between gap-4 lg:gap-6">
-          <Link className="flex min-w-0 items-center gap-3" to="/">
-            <div className="rounded-2xl bg-primary/10 p-1 shadow-soft ring-1 ring-primary/15">
-              <CriclyticsLogo />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-lg font-semibold tracking-tight">Criclytics</p>
-              <p className="truncate text-[10px] uppercase tracking-[0.28em] text-muted-foreground sm:text-xs">Live cricket intelligence</p>
-            </div>
-          </Link>
-
-          <div className="hidden min-w-0 flex-1 items-center justify-end gap-3 lg:flex">
-            <nav className="flex items-center gap-1 rounded-2xl border border-border/70 bg-card/70 p-1 shadow-soft">
-              {NAV_ITEMS.map((item) => (
-                <NavLink
-                  className={({ isActive }) =>
-                    cn(
-                      "rounded-xl px-4 py-2 text-sm font-semibold transition-colors",
-                      isActive ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    )
-                  }
-                  key={item.to}
-                  to={buildNavTarget(item.to, searchParams)}
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <form className="relative w-full max-w-sm xl:max-w-md" onSubmit={handleSubmit}>
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                className="pl-9 pr-4"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search teams, venue, toss, result"
-                value={query}
-              />
-            </form>
-
-            <Button aria-label="Toggle dark mode" onClick={toggleTheme} size="icon" type="button" variant="ghost">
-              {theme === "dark" ? <SunMedium className="h-5 w-5" /> : <MoonStar className="h-5 w-5" />}
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-1 lg:hidden">
-            <Button aria-label="Toggle dark mode" className="lg:hidden" onClick={toggleTheme} size="icon" type="button" variant="ghost">
-              {theme === "dark" ? <SunMedium className="h-5 w-5" /> : <MoonStar className="h-5 w-5" />}
-            </Button>
-            <Button
-              aria-controls="mobile-nav-panel"
-              aria-expanded={mobileMenuOpen}
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              className="lg:hidden"
-              onClick={() => setMobileMenuOpen((open) => !open)}
-              size="icon"
-              type="button"
-              variant="ghost"
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
+      <div className="container hidden items-center justify-between border-b border-border/60 py-2 md:flex">
+        <span className="eyebrow !text-[9px]">
+          An everyday companion to cricket
+        </span>
+        <span className="flex items-center gap-2 text-[10px] text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" /> Across
+          grounds. Around the world.
+        </span>
+      </div>
+      <div className="container flex h-[76px] items-center gap-8">
+        <Link aria-label="Cric Lytics home" className="shrink-0" to="/">
+          <CriclyticsLogo className="!h-11 !w-11" />
+        </Link>
+        <nav
+          aria-label="Main navigation"
+          className="hidden h-full items-center gap-7 lg:flex"
+        >
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              end={item.to === "/"}
+              key={item.to}
+              to={buildNavTarget(item.to, searchParams)}
+              className={({ isActive }) =>
+                `site-nav-link ${isActive ? "active" : ""}`
+              }
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-3 lg:hidden">
-          <form className="relative min-w-0 w-full" onSubmit={handleSubmit}>
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {item.to === "/live" && (
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              )}
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="ml-auto flex items-center gap-3">
+          <form
+            className="relative hidden w-60 xl:w-64 lg:block"
+            onSubmit={handleSubmit}
+            role="search"
+          >
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="pl-9 pr-4"
+              aria-label="Search cricket"
+              className="h-9 border-border bg-secondary/40 pl-9 text-xs"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search teams, venue, toss, result"
+              placeholder="Search teams, matches, stories"
               value={query}
             />
           </form>
-
-          <AnimatePresence initial={false}>
-            {mobileMenuOpen ? (
-              <motion.div
-                animate={{ opacity: 1, height: "auto", y: 0 }}
-                className="overflow-hidden rounded-2xl border border-border/70 bg-card/85 shadow-soft"
-                exit={{ opacity: 0, height: 0, y: -6 }}
-                id="mobile-nav-panel"
-                initial={{ opacity: 0, height: 0, y: -8 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-              >
-                <div className="grid gap-2 p-3">
-                  {NAV_ITEMS.map((item) => (
-                    <NavLink
-                      className={({ isActive }) =>
-                        cn(
-                          "rounded-xl px-4 py-3 text-sm font-semibold transition-colors",
-                          isActive ? "bg-foreground text-background" : "bg-background/70 text-foreground hover:bg-secondary"
-                        )
-                      }
-                      key={item.to}
-                      to={buildNavTarget(item.to, searchParams)}
-                    >
-                      {item.label}
-                    </NavLink>
-                  ))}
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          <Button
+            aria-label={searchOpen ? "Close search" : "Open search"}
+            aria-expanded={searchOpen}
+            aria-controls="mobile-search"
+            className="lg:hidden"
+            onClick={() => setSearchOpen(!searchOpen)}
+            size="icon"
+            variant="ghost"
+          >
+            {searchOpen ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            aria-label="Toggle dark mode"
+            onClick={toggleTheme}
+            size="icon"
+            variant="ghost"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </div>
+      {searchOpen && (
+        <form
+          id="mobile-search"
+          className="container pb-3 lg:hidden"
+          onSubmit={handleSubmit}
+          role="search"
+        >
+          <Input
+            autoFocus
+            aria-label="Search cricket"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search teams, matches, stories"
+            value={query}
+          />
+        </form>
+      )}
+      <nav
+        aria-label="Mobile navigation"
+        className="container flex gap-6 overflow-x-auto lg:hidden"
+      >
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            end={item.to === "/"}
+            key={item.to}
+            to={buildNavTarget(item.to, searchParams)}
+            className={({ isActive }) =>
+              `site-nav-link !h-11 !text-xs ${isActive ? "active" : ""}`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
     </header>
   );
 }
-
-function buildNavTarget(pathname: string, searchParams: URLSearchParams) {
-  const nextParams = new URLSearchParams();
-  const query = searchParams.get("q");
-  const series = searchParams.get("series");
-
-  if (query) {
-    nextParams.set("q", query);
+function buildNavTarget(pathname: string, params: URLSearchParams) {
+  const next = new URLSearchParams();
+  for (const key of ["q", "series"]) {
+    const value = params.get(key);
+    if (value) next.set(key, value);
   }
-
-  if (series) {
-    nextParams.set("series", series);
-  }
-
-  return {
-    pathname,
-    search: nextParams.toString() ? `?${nextParams.toString()}` : ""
-  };
+  return { pathname, search: next.toString() };
 }

@@ -1,477 +1,284 @@
 import { useDeferredValue } from "react";
-import { Activity, CalendarDays, Film, MapPin, RefreshCw, Trophy, Waves } from "lucide-react";
+import { ArrowRight, ArrowUpRight, RefreshCw } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { MatchSection } from "@/components/dashboard/MatchSection";
+import { MatchFeature } from "@/components/match/MatchFeature";
 import { ErrorPanel } from "@/components/shared/ErrorPanel";
 import { FeedHealthBanner } from "@/components/shared/FeedHealthBanner";
 import { LoadingCardGrid } from "@/components/shared/LoadingCardGrid";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { TeamAvatar } from "@/components/shared/TeamAvatar";
-import { Badge } from "@/components/ui/badge";
+import { SeriesFilter } from "@/components/shared/SeriesFilter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useDashboardQuery } from "@/hooks/use-dashboard-query";
 import { usePageMetadata } from "@/hooks/use-page-metadata";
 import { useRuntimeState } from "@/hooks/use-runtime-state";
 import {
   filterMatches,
   formatMatchDate,
-  formatMatchStatusText,
-  formatMatchSummaryText,
   formatRelativeUpdate,
-  formatSeriesLabel,
-  formatVenue,
-  getStatusDescription,
   getStatusEmptyMessage,
-  getLocalTimeZoneLabel
 } from "@/lib/formatters";
 import { getErrorMessage } from "@/lib/error-utils";
-import { buildCollectionPageSchema, buildWebsiteSchema } from "@/lib/seo";
-import { cn } from "@/lib/utils";
-import type { MatchSummary } from "@/types/cricket";
+import { buildWebsiteSchema } from "@/lib/seo";
 
 export function DashboardPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const seriesParam = searchParams.get("series");
-  const deferredQuery = useDeferredValue(searchParams.get("q") ?? "");
-  const query = useDashboardQuery(seriesParam);
+  const [params, setParams] = useSearchParams();
+  const search = useDeferredValue(params.get("q") ?? "");
+  const query = useDashboardQuery(params.get("series"));
   const runtime = useRuntimeState();
-  const isTransitionLoading = query.isFetching && query.isPlaceholderData;
-
   usePageMetadata({
     title: "Live Cricket Scores, Fixtures and Results",
     description:
-      "Track live cricket scores, upcoming fixtures, completed results, and full scorecards across series from one polished Criclytics dashboard.",
+      "Follow every session. Live cricket scores, upcoming matches, results and stories from around the world.",
     path: "/",
-    keywords: [
-      "live cricket scores",
-      "cricket fixtures",
-      "cricket results",
-      "cricket scorecards",
-      "IPL live scores",
-      "Criclytics dashboard"
-    ],
-    jsonLd: [
-      buildWebsiteSchema(),
-      buildCollectionPageSchema({
-        name: "Criclytics Dashboard",
-        description:
-          "Criclytics dashboard for live cricket scores, fixtures, completed matches, and scorecards.",
-        path: "/"
-      })
-    ]
+    jsonLd: buildWebsiteSchema(),
   });
-
-  if ((query.isPending && !query.data) || isTransitionLoading) {
-    return <LoadingCardGrid count={8} page />;
-  }
-
-  if (!query.data) {
-    return <ErrorPanel message={getErrorMessage(query.error, "Something went wrong while loading the live match centre.")} onRetry={() => void query.refetch()} title="Unable to load the match centre" />;
-  }
-
-  const liveMatches = filterMatches(query.data.live, deferredQuery);
-  const upcomingMatches = filterMatches(query.data.upcoming, deferredQuery);
-  const completedMatches = filterMatches(query.data.completed, deferredQuery);
-  const totalMatches = liveMatches.length + upcomingMatches.length + completedMatches.length;
-  const spotlightMatch = liveMatches[0] ?? upcomingMatches[0] ?? completedMatches[0] ?? null;
-
+  if (query.isPending && !query.data) return <LoadingCardGrid count={6} page />;
+  if (!query.data)
+    return (
+      <ErrorPanel
+        title="The scores are taking a moment"
+        message={getErrorMessage(query.error, "Please try again in a moment.")}
+        onRetry={() => void query.refetch()}
+      />
+    );
+  const data = query.data;
+  const live = filterMatches(data.live, search),
+    upcoming = filterMatches(data.upcoming, search),
+    completed = filterMatches(data.completed, search);
+  const featured = live[0] ?? upcoming[0] ?? completed[0];
+  const stories = data.featuredMedia?.stories.slice(0, 3) ?? [];
+  const target = (path: string) =>
+    `${path}${params.toString() ? `?${params}` : ""}`;
   return (
-    <div className="space-y-8">
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_360px]">
-        <Card className="h-full overflow-hidden rounded-[32px] border-border/70 bg-panel-glow dark:bg-panel-glow-dark">
-          <CardContent className="flex h-full flex-col p-6 sm:p-8">
-            <div className="flex flex-col gap-5 border-b border-border/60 pb-6 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-3xl">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge className="rounded-full px-3 py-1.5 tracking-[0.28em]" variant="outline">
-                    Match centre
-                  </Badge>
-                  <span className="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">{getLocalTimeZoneLabel()}</span>
-                </div>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Live cricket desk</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-                  Track the live board, the next scheduled start, and the freshest completed result from one cleaner match route.
+    <div className="space-y-9 sm:space-y-12">
+      <section>
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+          <div>
+            <p className="eyebrow mb-4">
+              The match centre <span className="mx-2 opacity-40">/</span>{" "}
+              Cricket, worldwide
+            </p>
+            <h1 className="editorial-title text-[48px] sm:text-[70px]">
+              The game, <em className="text-primary">in focus.</em>
+            </h1>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Every session. Every score. Closer to the cricket.
+            </p>
+          </div>
+          <div className="flex items-center gap-6 sm:pb-1">
+            {[
+              { key: "live", label: "In play", count: live.length },
+              { key: "upcoming", label: "Coming up", count: upcoming.length },
+              { key: "completed", label: "Results", count: completed.length },
+            ].map((item) => (
+              <Link
+                to={target("/" + item.key)}
+                key={item.key}
+                className="group border-l border-border pl-5"
+              >
+                <p className="score-number text-3xl font-semibold group-hover:text-primary">
+                  {String(item.count).padStart(2, "0")}
                 </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" variant="secondary">
-                  <Link to={buildRouteWithParams("/media", searchParams)}>
-                    <Film className="h-4 w-4" />
-                    Media room
-                  </Link>
-                </Button>
-                <Button onClick={() => void query.refetch()} size="lg" type="button" variant="outline">
-                  <RefreshCw className="h-4 w-4" />
-                  Refresh feed
-                </Button>
-              </div>
-            </div>
-
-            <div className="mt-6 grid flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-stretch">
-              <div className="min-w-0">
-                {spotlightMatch ? <BoardSpotlight match={spotlightMatch} searchParams={searchParams} /> : null}
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-3 lg:auto-rows-fr lg:grid-cols-1">
-                <DeskStatCard
-                  accentClassName="text-emerald-600 dark:text-emerald-300"
-                  href={buildRouteWithParams("/live", searchParams)}
-                  label="Live"
-                  sublabel={liveMatches.length ? "Active now" : "Quiet window"}
-                  value={liveMatches.length.toString()}
-                />
-                <DeskStatCard
-                  accentClassName="text-amber-600 dark:text-amber-300"
-                  href={buildRouteWithParams("/upcoming", searchParams)}
-                  label="Upcoming"
-                  sublabel="Scheduled ahead"
-                  value={upcomingMatches.length.toString()}
-                />
-                <DeskStatCard
-                  accentClassName="text-slate-600 dark:text-slate-300"
-                  href={buildRouteWithParams("/completed", searchParams)}
-                  label="Completed"
-                  sublabel="Results archived"
-                  value={completedMatches.length.toString()}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="h-full rounded-[32px] border-border/70 bg-card/90">
-          <CardContent className="space-y-5 p-6">
-            <SelectBlock
-              label="Series"
-              onChange={(event) => {
-                const nextParams = new URLSearchParams(searchParams);
-                const nextValue = event.target.value;
-
-                if (nextValue === "__default__") {
-                  nextParams.delete("series");
-                } else {
-                  nextParams.set("series", nextValue);
-                }
-
-                setSearchParams(nextParams, { replace: true });
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {item.label}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div
+          className="mt-8 flex gap-2 overflow-x-auto border-y border-border py-3"
+          aria-label="Competition shortcuts"
+        >
+          <button
+            className={`series-chip ${!params.get("series") || params.get("series") === "all" ? "active" : ""}`}
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.set("series", "all");
+              setParams(next, { replace: true });
+            }}
+          >
+            All cricket
+          </button>
+          {data.seriesOptions.map((option) => (
+            <button
+              key={option.value}
+              className={`series-chip ${params.get("series") === option.value ? "active" : ""}`}
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("series", option.value);
+                setParams(next, { replace: true });
               }}
-              value={seriesParam ?? "__default__"}
             >
-              <option value="__default__">Default feed</option>
-              <option value="all">All series</option>
-              {query.data.seriesOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label} ({option.count})
-                </option>
-              ))}
-            </SelectBlock>
-
-            <InfoTile icon={Waves} label="Coverage" value={formatSeriesLabel(query.data.appliedSeriesFilter || "all")} />
-            <InfoTile icon={Activity} label="Updated" value={formatRelativeUpdate(query.data.fetchedAt)} />
-            <InfoTile icon={Trophy} label="Visible cards" value={`${totalMatches} matches`} />
-
-            <div className="space-y-3">
-              {upcomingMatches[0] ? <RailMatchCard label="Next fixture" match={upcomingMatches[0]} /> : null}
-              {liveMatches[0] ? <RailMatchCard label="Live board" match={liveMatches[0]} /> : null}
-              {!liveMatches[0] && completedMatches[0] ? <RailMatchCard label="Latest result" match={completedMatches[0]} /> : null}
-            </div>
-          </CardContent>
-        </Card>
+              {option.label}
+            </button>
+          ))}
+        </div>
       </section>
-
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)]">
+        <div className="min-w-0">
+          {featured ? (
+            <MatchFeature match={featured} />
+          ) : (
+            <div className="rounded-lg border border-border p-10">
+              <h2 className="text-xl font-bold">No matches found</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Try another competition or search term.
+              </p>
+            </div>
+          )}
+        </div>
+        <aside className="flex min-w-0 flex-col rounded-lg border border-border bg-card px-6 py-5">
+          <div className="section-heading !pb-3">
+            <h2 className="!text-base">On the horizon</h2>
+            <Link aria-label="See full schedule" to={target("/upcoming")}>
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
+          {upcoming.slice(0, 3).map((match) => (
+            <Link
+              key={match.id}
+              className="group border-b border-border/60 py-4 last:border-0"
+              to={`/match/${match.id}`}
+            >
+              <p className="eyebrow truncate !text-[9px]">{match.seriesName}</p>
+              <div className="my-3 flex items-center gap-2">
+                {match.teams.slice(0, 2).map((team, i) => (
+                  <div
+                    className="flex min-w-0 items-center gap-2"
+                    key={team.name}
+                  >
+                    {i === 1 && (
+                      <span className="mx-1 text-[10px] text-muted-foreground">
+                        vs
+                      </span>
+                    )}
+                    <TeamAvatar size="sm" team={team} />
+                    <span className="text-sm font-bold group-hover:text-primary">
+                      {team.shortName}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {formatMatchDate(match.startTime)}
+              </p>
+            </Link>
+          ))}
+          {!upcoming.length && (
+            <p className="py-8 text-sm text-muted-foreground">
+              No upcoming fixtures in this view.
+            </p>
+          )}
+          <Link
+            className="mt-auto flex items-center justify-between border-t border-border pt-4 text-xs font-semibold"
+            to={target("/upcoming")}
+          >
+            Explore the schedule <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </aside>
+      </section>
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-5 sm:flex-row sm:items-center">
+        <SeriesFilter options={data.seriesOptions} />
+        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          {formatRelativeUpdate(data.fetchedAt)}
+          <Button
+            aria-label="Refresh scores"
+            onClick={() => void query.refetch()}
+            size="sm"
+            variant="ghost"
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${query.isFetching ? "animate-spin" : ""}`}
+            />
+          </Button>
+        </div>
+      </div>
       <FeedHealthBanner
-        cacheAgeSeconds={query.data.cacheAgeSeconds}
-        fallbackMessage={query.data.fallbackMessage}
+        cacheAgeSeconds={data.cacheAgeSeconds}
+        fallbackMessage={data.fallbackMessage}
         isFetching={query.isFetching}
         isOnline={runtime.isOnline}
-        isStale={query.data.isStale}
+        isStale={data.isStale}
         isVisible={runtime.isVisible}
-        refreshIntervalSeconds={query.data.refreshIntervalSeconds}
+        refreshIntervalSeconds={data.refreshIntervalSeconds}
       />
-
-      {query.error ? <ErrorPanel compact message={getErrorMessage(query.error, "Something went wrong while loading the live match centre.")} onRetry={() => void query.refetch()} title="Feed warning" /> : null}
-
+      {query.error && (
+        <ErrorPanel
+          compact
+          title="Score update delayed"
+          message={getErrorMessage(
+            query.error,
+            "Please try again in a moment.",
+          )}
+          onRetry={() => void query.refetch()}
+        />
+      )}
       <MatchSection
-        actionHref={buildRouteWithParams("/live", searchParams)}
-        description={getStatusDescription("live")}
+        title="Around the grounds"
+        description="Live cricket matches"
+        matches={live.slice(0, 6)}
+        actionHref={target("/live")}
+        emptyTitle="A quiet moment between games"
         emptyDescription={getStatusEmptyMessage("live")}
-        emptyTitle="No live matches"
-        matches={liveMatches}
-        title="Live now"
       />
-
+      {stories.length > 0 && (
+        <section className="space-y-5">
+          <div className="section-heading">
+            <h2>Beyond the boundary</h2>
+            <Link
+              className="flex items-center gap-2 text-xs font-semibold"
+              to={target("/media")}
+            >
+              The clubhouse <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {stories.map((story) => (
+              <Link
+                className="group min-w-0"
+                to={target("/media")}
+                key={story.id}
+              >
+                {story.imageUrl && (
+                  <div className="overflow-hidden rounded-md">
+                    <img
+                      alt={story.title}
+                      src={story.imageUrl}
+                      className="news-image transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <p className="eyebrow mt-4 !text-[9px]">
+                  {story.contextLabel || "From the clubhouse"}
+                </p>
+                <h3 className="mt-2 text-lg font-semibold leading-snug tracking-tight group-hover:text-primary">
+                  {story.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
       <MatchSection
-        actionHref={buildRouteWithParams("/upcoming", searchParams)}
-        description={getStatusDescription("upcoming")}
+        title="Next to the crease"
+        description="Upcoming cricket fixtures"
+        matches={upcoming.slice(0, 6)}
+        actionHref={target("/upcoming")}
+        emptyTitle="No upcoming matches"
         emptyDescription={getStatusEmptyMessage("upcoming")}
-        emptyTitle="No upcoming fixtures"
-        matches={upcomingMatches}
-        title="Upcoming"
       />
-
       <MatchSection
-        actionHref={buildRouteWithParams("/completed", searchParams)}
-        description={getStatusDescription("completed")}
+        title="The final word"
+        description="Recent cricket results"
+        matches={completed.slice(0, 6)}
+        actionHref={target("/completed")}
+        emptyTitle="No results yet"
         emptyDescription={getStatusEmptyMessage("completed")}
-        emptyTitle="No completed matches"
-        matches={completedMatches}
-        title="Completed"
       />
     </div>
   );
-}
-
-function BoardSpotlight({ match, searchParams }: { match: MatchSummary; searchParams: URLSearchParams }) {
-  const [teamA, teamB] = match.teams.slice(0, 2);
-  const detailHref = buildRouteWithParams(`/match/${match.id}`, searchParams);
-
-  return (
-    <div className="flex h-full flex-col rounded-[28px] border border-border/70 bg-background/65 p-5 shadow-soft sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">{match.seriesName}</p>
-          <p className="mt-3 max-w-2xl text-xl font-semibold leading-8 sm:text-2xl">{formatMatchSummaryText(match)}</p>
-        </div>
-        <StatusBadge status={match.status} />
-      </div>
-
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <SpotlightTeam team={teamA} />
-        <div className="shrink-0 rounded-full border border-border/70 bg-secondary/65 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-          VS
-        </div>
-        <SpotlightTeam align="right" team={teamB} />
-      </div>
-
-      <div className="mt-6 grid gap-3 md:grid-cols-2">
-        {match.scoreLines.length ? (
-          match.scoreLines.slice(0, 2).map((line) => (
-            <div className="rounded-2xl border border-border/70 bg-secondary/45 p-4" key={line.inning}>
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{line.teamName}</p>
-                {line.overs ? <span className="text-xs font-medium text-muted-foreground">{line.overs} ov</span> : null}
-              </div>
-              <p className="mt-2 text-xl font-semibold tracking-tight">{line.display}</p>
-            </div>
-          ))
-        ) : (
-          <>
-            <MetaTile icon={CalendarDays} label="Scheduled start" value={formatMatchDate(match.startTime, "long")} />
-            <MetaTile icon={MapPin} label="Venue" value={formatVenue(match.venue)} />
-          </>
-        )}
-      </div>
-
-      {!match.scoreLines.length && match.status === "upcoming" ? (
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <SpotlightMiniTile label="Matchday" value={getSpotlightMatchday(match)} />
-          <SpotlightMiniTile label="Starts in" value={getCountdownToStart(match.startTime)} />
-          <SpotlightMiniTile label="Local zone" value={getLocalTimeZoneLabel()} />
-        </div>
-      ) : null}
-
-      <div className="mt-auto grid gap-3 pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
-        <div className="rounded-2xl border border-border/70 bg-background/75 p-4 text-sm leading-6 text-muted-foreground">
-          {match.tossSummary || match.resultText || formatMatchStatusText(match)}
-        </div>
-        <Button asChild className="w-full md:w-auto" variant={match.status === "live" ? "default" : "secondary"}>
-          <Link to={detailHref}>Open scorecard</Link>
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function SelectBlock({
-  label,
-  value,
-  onChange,
-  children
-}: React.PropsWithChildren<{ label: string; value: string; onChange: React.ChangeEventHandler<HTMLSelectElement> }>) {
-  return (
-    <label className="block space-y-2">
-      <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{label}</span>
-      <select
-        className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
-        onChange={onChange}
-        value={value}
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
-
-function SpotlightTeam({
-  team,
-  align = "left"
-}: {
-  team: MatchSummary["teams"][number];
-  align?: "left" | "right";
-}) {
-  return (
-    <div className={cn("flex min-w-0 items-center gap-3", align === "right" ? "flex-row-reverse justify-end text-right" : "justify-start text-left")}>
-      <TeamAvatar size="md" team={team} />
-      <div className="min-w-0">
-        <p className="text-xl font-semibold tracking-tight sm:text-2xl">{team.shortName}</p>
-        <p className="mt-1 hidden truncate text-sm text-muted-foreground sm:block">{team.name}</p>
-      </div>
-    </div>
-  );
-}
-
-function InfoTile({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border/70 bg-secondary/40 p-4">
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-        <Icon className="h-4 w-4" />
-        {label}
-      </div>
-      <p className="mt-3 text-sm font-semibold leading-6">{value}</p>
-    </div>
-  );
-}
-
-function SpotlightMiniTile({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border/70 bg-secondary/35 p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
-      <p className="mt-2 text-sm font-semibold leading-6 text-foreground">{value}</p>
-    </div>
-  );
-}
-
-function getSpotlightMatchday(match: MatchSummary) {
-  const lead = match.summary
-    .split("•")
-    .map((part) => part.trim())
-    .find(Boolean);
-
-  if (!lead) {
-    return match.seriesName;
-  }
-
-  if (/starts /i.test(lead) || /\b(gmt|utc)\b/i.test(lead)) {
-    return match.seriesName;
-  }
-
-  return lead;
-}
-
-function getCountdownToStart(value: string | null) {
-  if (!value) {
-    return "Awaiting schedule";
-  }
-
-  const startMs = Date.parse(value);
-
-  if (Number.isNaN(startMs)) {
-    return "Awaiting schedule";
-  }
-
-  const deltaMs = startMs - Date.now();
-
-  if (deltaMs <= 0) {
-    return "Starting soon";
-  }
-
-  const totalMinutes = Math.round(deltaMs / 60_000);
-  const days = Math.floor(totalMinutes / 1_440);
-  const hours = Math.floor((totalMinutes % 1_440) / 60);
-  const minutes = totalMinutes % 60;
-
-  if (days > 0) {
-    return `${days}d ${hours}h`;
-  }
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  return `${minutes}m`;
-}
-
-function DeskStatCard({
-  label,
-  value,
-  href,
-  sublabel,
-  accentClassName
-}: {
-  label: string;
-  value: string;
-  href: string;
-  sublabel: string;
-  accentClassName?: string;
-}) {
-  return (
-    <Link className="flex h-full flex-col rounded-2xl border border-border/70 bg-background/75 p-4 transition hover:border-primary/40 hover:shadow-soft" to={href}>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
-        <div className={cn("h-2.5 w-2.5 rounded-full bg-current", accentClassName)} />
-      </div>
-      <div className="mt-auto flex items-end justify-between gap-4 pt-4">
-        <p className="text-3xl font-semibold tracking-tight">{value}</p>
-        <p className="text-right text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">{sublabel}</p>
-      </div>
-    </Link>
-  );
-}
-
-function RailMatchCard({ match, label }: { match: MatchSummary; label: string }) {
-  const [teamA, teamB] = match.teams.slice(0, 2);
-  const primaryMeta = match.scoreLines[0]?.display || formatMatchDate(match.startTime, "short");
-
-  return (
-    <Link className="block rounded-2xl border border-border/70 bg-background/70 p-4 transition hover:border-primary/35 hover:shadow-soft" to={`/match/${match.id}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
-          <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6">
-            {teamA.shortName} vs {teamB.shortName}
-          </p>
-        </div>
-        <StatusBadge status={match.status} />
-      </div>
-      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{match.seriesName}</p>
-      <p className="mt-3 text-sm font-semibold">{primaryMeta}</p>
-      <p className="mt-1 text-sm leading-6 text-muted-foreground">{match.status === "upcoming" ? formatVenue(match.venue) : formatMatchStatusText(match)}</p>
-    </Link>
-  );
-}
-
-function MetaTile({
-  icon: Icon,
-  label,
-  value
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-border/70 bg-secondary/45 p-4">
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-        <Icon className="h-4 w-4" />
-        {label}
-      </div>
-      <p className="mt-2 text-sm font-semibold leading-6">{value}</p>
-    </div>
-  );
-}
-
-function buildRouteWithParams(pathname: string, searchParams: URLSearchParams) {
-  const nextParams = new URLSearchParams();
-
-  for (const key of ["q", "series"]) {
-    const value = searchParams.get(key);
-
-    if (value) {
-      nextParams.set(key, value);
-    }
-  }
-
-  return `${pathname}${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
 }

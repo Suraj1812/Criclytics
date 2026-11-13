@@ -7,10 +7,20 @@ export function buildWebsiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Criclytics",
+    name: "Cric Lytics",
+    alternateName: "Criclytics",
     url: origin,
+    publisher: {
+      "@type": "Organization",
+      name: "Cric Lytics",
+      url: origin,
+      logo: {
+        "@type": "ImageObject",
+        url: toAbsoluteUrl("/brand/cric-lytics-logo.png")
+      }
+    },
     description:
-      "Criclytics is a live cricket match centre for scores, fixtures, completed results, full scorecards, and cricket media.",
+      "Cric Lytics is a live cricket match centre for scores, fixtures, completed results, full scorecards, and cricket media.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${origin}?q={search_term_string}`,
@@ -36,7 +46,7 @@ export function buildCollectionPageSchema({
     url: toAbsoluteUrl(path),
     isPartOf: {
       "@type": "WebSite",
-      name: "Criclytics",
+      name: "Cric Lytics",
       url: toAbsoluteUrl("/")
     }
   };

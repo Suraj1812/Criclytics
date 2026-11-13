@@ -14,9 +14,9 @@ export function EmptyState({
   onAction?: () => void;
 }) {
   return (
-    <Card className="rounded-3xl border-dashed">
+    <Card className="rounded-lg border-dashed">
       <CardHeader>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-secondary text-muted-foreground">
           <SearchX className="h-5 w-5" />
         </div>
         <CardTitle className="mt-4">{title}</CardTitle>

@@ -5,13 +5,13 @@ export function LoadingCardGrid({ count = 8, page = false }: { count?: number; p
     <div className={page ? "space-y-6" : ""}>
       {page ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_0.6fr]">
-          <Skeleton className="h-48 rounded-3xl" />
-          <Skeleton className="h-48 rounded-3xl" />
+          <Skeleton className="h-36 rounded-lg" />
+          <Skeleton className="h-36 rounded-lg" />
         </div>
       ) : null}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3">
         {Array.from({ length: count }).map((_, index) => (
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-soft" key={index}>
+          <div className="rounded-md border border-border bg-card p-4 shadow-soft" key={index}>
             <Skeleton className="h-5 w-28" />
             <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
               <div className="flex flex-col items-center gap-2">

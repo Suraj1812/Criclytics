@@ -10,16 +10,16 @@ export default {
         sm: "100%",
         md: "100%",
         lg: "100%",
-        xl: "1380px",
-        "2xl": "1500px"
+        xl: "1280px",
+        "2xl": "1360px",
       },
       padding: {
         DEFAULT: "0.75rem",
         sm: "1rem",
         lg: "1.25rem",
         xl: "1.5rem",
-        "2xl": "1.5rem"
-      }
+        "2xl": "1.5rem",
+      },
     },
     extend: {
       colors: {
@@ -30,49 +30,47 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))"
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))"
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))"
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))"
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))"
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))"
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))"
-        }
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       borderRadius: {
         xl: "calc(var(--radius) - 4px)",
         "2xl": "var(--radius)",
-        "3xl": "calc(var(--radius) + 8px)"
+        "3xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        soft: "0 20px 50px -30px rgba(15, 23, 42, 0.35)",
-        lifted: "0 24px 80px -32px rgba(2, 8, 23, 0.5)"
+        soft: "0 2px 5px rgba(20, 35, 25, 0.03)",
+        lifted: "0 10px 28px rgba(20, 35, 25, 0.08)",
       },
       backgroundImage: {
-        "panel-glow":
-          "radial-gradient(circle at top left, rgba(56,189,248,0.16), transparent 32%), linear-gradient(145deg, rgba(255,255,255,0.94), rgba(240,246,255,0.9))",
-        "panel-glow-dark":
-          "radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 34%), linear-gradient(145deg, rgba(11,18,32,0.94), rgba(12,20,36,0.92))"
-      }
-    }
+        "panel-glow": "none",
+        "panel-glow-dark": "none",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 } satisfies Config;

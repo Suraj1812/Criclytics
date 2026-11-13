@@ -19,24 +19,31 @@ Real cricket match centre with a FastAPI backend, real match scorecards, and sta
 
 ## Local setup
 
+Requires Node.js 20.19+ and Python 3.9+ on macOS or Linux.
+
 ```bash
-npm install
-python3 -m pip install -r server/requirements.txt
-cp .env.example .env.local
+npm run setup
+npm run dev
 ```
 
-Set the optional default feed filter if you want to lock the dashboard to a competition like IPL:
+Open **http://localhost:5173**. The dev command starts both Vite and the FastAPI backend (port 8787). Press Ctrl+C to stop both. `npm start` and `npm run dev:all` do the same thing.
+
+Setup installs frontend dependencies, creates an isolated Python `.venv`, installs backend dependencies, and creates `.env.local` if it does not already exist. No virtual environment activation or API key is needed. Run setup again after dependency changes.
+
+All competitions are shown by default. Set the optional filter in `.env.local` if you want to lock the dashboard to a competition like IPL, then restart:
 
 ```bash
 CRICKET_SERIES_FILTER=indian premier league
 ```
 
-Then run the backend and frontend in separate terminals:
+To run the backend and frontend in separate terminals instead:
 
 ```bash
 npm run dev:api
-npm run dev
+npm run dev:web
 ```
+
+Verify the backend at http://localhost:5173/health (or directly at http://127.0.0.1:8787/health). Match data requires internet access to Cricbuzz; the initial feed can take a moment to load. If either local port is occupied, stop the existing service before restarting.
 
 ## Environment variables
 
@@ -58,6 +65,8 @@ Notes:
 
 ```bash
 npm run dev
+npm run setup
+npm run dev:web
 npm run dev:api
 npm run dev:all
 npm run build
